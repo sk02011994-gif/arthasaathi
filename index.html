@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="ArthaSaathi"/>
+  <meta name="application-name" content="ArthaSaathi"/>
+  <meta name="theme-color" content="#0a0a0f"/>
+  <meta name="description" content="Track expenses, crush debt with Karza Mukti, and build savings goals. Built for India."/>
+
+  <!-- Open Graph (for sharing) -->
+  <meta property="og:title" content="ArthaSaathi — Your Money Companion"/>
+  <meta property="og:description" content="Track every rupee. Crush debt. Build savings. Made for India."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="/icons/icon-512.png"/>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json"/>
+
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="/icons/icon-192.png"/>
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png"/>
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png"/>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/icons/icon-96.svg"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96.png"/>
+
+  <!-- iOS Splash Screens (optional, improves launch feel) -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+  <title>ArthaSaathi — Your Money Companion</title>
+
+  <!-- Preconnect fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"/>
+
+  <style>
+    /* ── App loading shell ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f7f2ea;
+      color: #0a0a0f;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+      /* Safe area insets for notch phones */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    #root { height: 100%; }
+
+    /* ── Splash loader shown before React hydrates ── */
+    #splash {
+      position: fixed; inset: 0;
+      background: #0a0a0f;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .splash-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px; font-weight: 600;
+      background: linear-gradient(90deg, #c9a84c 0%, #e8c97a 50%, #c9a84c 100%);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 2s linear infinite;
+      letter-spacing: -0.5px;
+    }
+    .splash-sub {
+      font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); margin-top: 8px;
+    }
+    .splash-ring {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 2px solid rgba(201,168,76,0.2);
+      border-top-color: #c9a84c;
+      animation: spin 1s linear infinite;
+      margin-bottom: 28px;
+    }
+    @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ── Install banner ── */
+    #install-banner {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(135deg, #0a0a0f, #1a1a2e);
+      border-top: 1px solid rgba(201,168,76,0.2);
+      padding: 16px 20px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      display: none; align-items: center; justify-content: space-between; gap: 12px;
+      z-index: 500; animation: slideUp 0.4s ease both;
+    }
+    #install-banner.visible { display: flex; }
+    .install-text { flex: 1 }
+    .install-title { font-size: 13px; font-weight: 600; color: white; margin-bottom: 2px; }
+    .install-sub   { font-size: 11px; color: rgba(255,255,255,0.4); }
+    .install-btn {
+      background: linear-gradient(135deg,#c9a84c,#e8c97a);
+      color: #0a0a0f; border: none; padding: 10px 20px;
+      border-radius: 50px; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    }
+    .install-dismiss {
+      background: none; border: none; color: rgba(255,255,255,0.3);
+      font-size: 22px; cursor: pointer; padding: 4px; flex-shrink: 0;
+    }
+    @keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+
+    /* ── Update banner ── */
+    #update-banner {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #2d8c64; color: white;
+      padding: 12px 20px;
+      display: none; align-items: center; justify-content: space-between;
+      z-index: 600; font-size: 13px; font-weight: 500;
+    }
+    #update-banner.visible { display: flex; }
+    .update-btn {
+      background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+      color: white; padding: 6px 16px; border-radius: 50px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ── Offline indicator ── */
+    #offline-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #d64f3a; color: white; text-align: center;
+      padding: 8px; font-size: 12px; font-weight: 500;
+      display: none; z-index: 700;
+    }
+    body.offline #offline-bar { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- Offline indicator -->
+  <div id="offline-bar">📡 You're offline — ArthaSaathi still works! Data is saved locally.</div>
+
+  <!-- Splash screen -->
+  <div id="splash">
+    <div class="splash-ring"></div>
+    <div class="splash-logo">ArthaSaathi</div>
+    <div class="splash-sub">Your Money Companion</div>
+  </div>
+
+  <!-- React app root -->
+  <div id="root"></div>
+
+  <!-- Install to home screen banner -->
+  <div id="install-banner">
+    <div class="install-text">
+      <div class="install-title">📱 Add to Home Screen</div>
+      <div class="install-sub">Use ArthaSaathi like a native app — offline too!</div>
+    </div>
+    <button class="install-btn" id="install-btn">Install</button>
+    <button class="install-dismiss" id="install-dismiss">×</button>
+  </div>
+
+  <!-- Update available banner -->
+  <div id="update-banner" id="update-banner">
+    <span>🎉 New update available!</span>
+    <button class="update-btn" id="update-btn">Refresh</button>
+  </div>
+
+  <script>
+    // ── Service Worker Registration ──────────────────────────────────────────
+    let swRegistration = null;
+    let newWorker = null;
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          swRegistration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+          console.log('[App] Service Worker registered:', swRegistration.scope);
+
+          // Check for updates on each load
+          swRegistration.addEventListener('updatefound', () => {
+            newWorker = swRegistration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New version available — show update banner
+                document.getElementById('update-banner').classList.add('visible');
+              }
+            });
+          });
+
+          // Listen for controlling SW change → reload
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.location.reload();
+          });
+
+        } catch (err) {
+          console.error('[App] Service Worker registration failed:', err);
+        }
+      });
+    }
+
+    // ── Update button ────────────────────────────────────────────────────────
+    document.getElementById('update-btn').addEventListener('click', () => {
+      if (newWorker) newWorker.postMessage({ type: 'SKIP_WAITING' });
+    });
+
+    // ── PWA Install Prompt ───────────────────────────────────────────────────
+    let deferredPrompt = null;
+    const installBanner  = document.getElementById('install-banner');
+    const installBtn     = document.getElementById('install-btn');
+    const installDismiss = document.getElementById('install-dismiss');
+
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      // Show banner after 3 seconds (don't interrupt immediately)
+      const dismissed = localStorage.getItem('as_install_dismissed');
+      if (!dismissed) {
+        setTimeout(() => installBanner.classList.add('visible'), 3000);
+      }
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      installBanner.classList.remove('visible');
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('[App] Install outcome:', outcome);
+      deferredPrompt = null;
+      if (outcome === 'accepted') {
+        localStorage.setItem('as_install_dismissed', 'true');
+      }
+    });
+
+    installDismiss.addEventListener('click', () => {
+      installBanner.classList.remove('visible');
+      localStorage.setItem('as_install_dismissed', 'true');
+    });
+
+    // Hide banner if already installed
+    window.addEventListener('appinstalled', () => {
+      installBanner.classList.remove('visible');
+      deferredPrompt = null;
+      console.log('[App] ArthaSaathi installed to home screen!');
+    });
+
+    // ── Offline / Online detection ───────────────────────────────────────────
+    function updateOnlineStatus() {
+      document.body.classList.toggle('offline', !navigator.onLine);
+    }
+    window.addEventListener('online',  updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    // ── Splash hide (after React mounts) ────────────────────────────────────
+    // React will call window.hideSplash() when it's ready
+    window.hideSplash = () => {
+      const splash = document.getElementById('splash');
+      splash.classList.add('hidden');
+      setTimeout(() => splash.remove(), 600);
+    };
+
+    // Fallback: hide splash after 3s even if React is slow
+    setTimeout(() => {
+      const splash = document.getElementById('splash');
+      if (splash) splash.classList.add('hidden');
+    }, 3000);
+
+    // ── Handle shortcuts from manifest ──────────────────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    const action = params.get('action');
+    if (action) {
+      window.__AS_LAUNCH_ACTION__ = action;
+      // React app reads window.__AS_LAUNCH_ACTION__ on mount
+    }
+
+    // ── iOS standalone detection ─────────────────────────────────────────────
+    const isIosStandalone = window.navigator.standalone === true;
+    if (isIosStandalone) {
+      document.body.classList.add('ios-standalone');
+      console.log('[App] Running in iOS standalone mode');
+    }
+  </script>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  DEVELOPER NOTE — Integrating with React                 ║
+  ║                                                          ║
+  ║  In your React build (Vite/CRA), this index.html is      ║
+  ║  your public/index.html template. The React bundle       ║
+  ║  mounts at <div id="root">.                              ║
+  ║                                                          ║
+  ║  In your App.jsx root component, add:                    ║
+  ║                                                          ║
+  ║  useEffect(() => {                                       ║
+  ║    window.hideSplash?.();                                ║
+  ║    // Handle launch action:                              ║
+  ║    if (window.__AS_LAUNCH_ACTION__ === 'add-expense') {  ║
+  ║      setModal('expense');                                ║
+  ║    }                                                     ║
+  ║  }, []);                                                 ║
+  ╚══════════════════════════════════════════════════════════╝
+  -->
+
+</body>
+</html>
