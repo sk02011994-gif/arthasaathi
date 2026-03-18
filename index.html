@@ -1,312 +1,803 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="ArthaSaathi"/>
-  <meta name="application-name" content="ArthaSaathi"/>
-  <meta name="theme-color" content="#0a0a0f"/>
-  <meta name="description" content="Track expenses, crush debt with Karza Mukti, and build savings goals. Built for India."/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ArthaSaathi"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<meta name="description" content="Track expenses, crush debt with Karza Mukti, and build savings goals. Built for India."/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
+<title>ArthaSaathi — Your Money Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=DM+Sans:wght@300;400;500;600&display=swap"/>
 
-  <!-- Open Graph (for sharing) -->
-  <meta property="og:title" content="ArthaSaathi — Your Money Companion"/>
-  <meta property="og:description" content="Track every rupee. Crush debt. Build savings. Made for India."/>
-  <meta property="og:type" content="website"/>
-  <meta property="og:image" content="/icons/icon-512.png"/>
+<!-- React + Babel + Recharts via CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.min.js"></script>
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0a0a0f;--cream:#f5f0e8;--gold:#c9a84c;--gold-light:#e8c97a;
+  --gold-pale:#f5e9c8;--muted:#7a7468;--card:#ffffff;
+  --border:rgba(201,168,76,0.18);--red:#d64f3a;--green:#2d8c64;
+  --blue:#3a6fd6;--purple:#7c5cbf;
+}
+html,body,#root{height:100%}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--ink);overscroll-behavior:none;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:0;height:0}
+input,select,textarea{font-family:'DM Sans',sans-serif}
 
-  <!-- Apple Touch Icons -->
-  <link rel="apple-touch-icon" href="/icons/icon-192.png"/>
-  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png"/>
-  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png"/>
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes scaleIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes popIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/icons/icon-96.svg"/>
-  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96.png"/>
+.display{font-family:'Cormorant Garamond',serif}
+.fade-up{animation:fadeUp 0.48s ease both}
+.fade-up-1{animation:fadeUp 0.48s 0.05s ease both}
+.fade-up-2{animation:fadeUp 0.48s 0.12s ease both}
+.fade-up-3{animation:fadeUp 0.48s 0.20s ease both}
+.fade-up-4{animation:fadeUp 0.48s 0.28s ease both}
+.fade-up-5{animation:fadeUp 0.48s 0.36s ease both}
+.slide-in{animation:slideIn 0.32s ease both}
+.scale-in{animation:scaleIn 0.28s ease both}
+.pop-in{animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both}
+.milestone-badge{animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both}
 
-  <!-- iOS Splash Screens (optional, improves launch feel) -->
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+.gold-shimmer{
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold-light) 40%,var(--gold) 80%);
+  background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 3s linear infinite
+}
+.btn-gold{
+  background:linear-gradient(135deg,#c9a84c,#e8c97a,#c9a84c);background-size:200%;
+  color:var(--ink);font-weight:600;border:none;cursor:pointer;
+  transition:background-position 0.4s,transform 0.15s,box-shadow 0.2s;
+  box-shadow:0 3px 14px rgba(201,168,76,0.35)
+}
+.btn-gold:active{transform:translateY(0)}
+.card{background:var(--card);border-radius:20px;border:1px solid var(--border);box-shadow:0 2px 24px rgba(10,10,15,0.06)}
+input:focus,select:focus{outline:none!important;border-color:var(--gold)!important;box-shadow:0 0 0 3px rgba(201,168,76,0.14)!important}
+.entry-row{transition:background 0.18s;border-radius:12px}
+.entry-row:hover{background:var(--gold-pale)}
+.del-btn{opacity:0;transition:opacity 0.18s;cursor:pointer}
+.entry-row:hover .del-btn{opacity:1}
+.overspend-banner{background:linear-gradient(135deg,#d64f3a22,#d64f3a0a);border-left:3px solid var(--red)}
+.debt-card,.goal-card{transition:transform 0.2s,box-shadow 0.2s}
+.debt-card:hover,.goal-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(10,10,15,0.1)}
 
-  <title>ArthaSaathi — Your Money Companion</title>
+/* Splash */
+#splash{position:fixed;inset:0;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s,visibility 0.5s}
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.splash-ring{width:52px;height:52px;border-radius:50%;border:2px solid rgba(201,168,76,0.2);border-top-color:#c9a84c;animation:spin 1s linear infinite;margin-bottom:24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.splash-logo{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;background:linear-gradient(90deg,#c9a84c,#e8c97a,#c9a84c);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 2s linear infinite}
+.splash-sub{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:8px}
 
-  <!-- Preconnect fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"/>
-
-  <style>
-    /* ── App loading shell ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #f7f2ea;
-      color: #0a0a0f;
-      -webkit-font-smoothing: antialiased;
-      overscroll-behavior: none;
-      /* Safe area insets for notch phones */
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    #root { height: 100%; }
-
-    /* ── Splash loader shown before React hydrates ── */
-    #splash {
-      position: fixed; inset: 0;
-      background: #0a0a0f;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-    #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .splash-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 36px; font-weight: 600;
-      background: linear-gradient(90deg, #c9a84c 0%, #e8c97a 50%, #c9a84c 100%);
-      background-size: 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shimmer 2s linear infinite;
-      letter-spacing: -0.5px;
-    }
-    .splash-sub {
-      font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
-      color: rgba(255,255,255,0.3); margin-top: 8px;
-    }
-    .splash-ring {
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 2px solid rgba(201,168,76,0.2);
-      border-top-color: #c9a84c;
-      animation: spin 1s linear infinite;
-      margin-bottom: 28px;
-    }
-    @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
-    @keyframes spin { to{transform:rotate(360deg)} }
-
-    /* ── Install banner ── */
-    #install-banner {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: linear-gradient(135deg, #0a0a0f, #1a1a2e);
-      border-top: 1px solid rgba(201,168,76,0.2);
-      padding: 16px 20px;
-      padding-bottom: calc(16px + env(safe-area-inset-bottom));
-      display: none; align-items: center; justify-content: space-between; gap: 12px;
-      z-index: 500; animation: slideUp 0.4s ease both;
-    }
-    #install-banner.visible { display: flex; }
-    .install-text { flex: 1 }
-    .install-title { font-size: 13px; font-weight: 600; color: white; margin-bottom: 2px; }
-    .install-sub   { font-size: 11px; color: rgba(255,255,255,0.4); }
-    .install-btn {
-      background: linear-gradient(135deg,#c9a84c,#e8c97a);
-      color: #0a0a0f; border: none; padding: 10px 20px;
-      border-radius: 50px; font-size: 13px; font-weight: 600;
-      cursor: pointer; white-space: nowrap; flex-shrink: 0;
-    }
-    .install-dismiss {
-      background: none; border: none; color: rgba(255,255,255,0.3);
-      font-size: 22px; cursor: pointer; padding: 4px; flex-shrink: 0;
-    }
-    @keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
-
-    /* ── Update banner ── */
-    #update-banner {
-      position: fixed; top: 0; left: 0; right: 0;
-      background: #2d8c64; color: white;
-      padding: 12px 20px;
-      display: none; align-items: center; justify-content: space-between;
-      z-index: 600; font-size: 13px; font-weight: 500;
-    }
-    #update-banner.visible { display: flex; }
-    .update-btn {
-      background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
-      color: white; padding: 6px 16px; border-radius: 50px;
-      font-size: 12px; font-weight: 600; cursor: pointer;
-    }
-
-    /* ── Offline indicator ── */
-    #offline-bar {
-      position: fixed; top: 0; left: 0; right: 0;
-      background: #d64f3a; color: white; text-align: center;
-      padding: 8px; font-size: 12px; font-weight: 500;
-      display: none; z-index: 700;
-    }
-    body.offline #offline-bar { display: block; }
-  </style>
+/* Install banner */
+#install-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#0a0a0f,#1a1a2e);border-top:1px solid rgba(201,168,76,0.2);padding:14px 18px 28px;display:none;align-items:center;gap:12px;z-index:500}
+#install-banner.show{display:flex}
+.ib-title{font-size:13px;font-weight:600;color:white}
+.ib-sub{font-size:11px;color:rgba(255,255,255,0.4)}
+.ib-btn{background:linear-gradient(135deg,#c9a84c,#e8c97a);color:#0a0a0f;border:none;padding:9px 18px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.ib-x{background:none;border:none;color:rgba(255,255,255,0.3);font-size:22px;cursor:pointer;flex-shrink:0}
+</style>
 </head>
 <body>
 
-  <!-- Offline indicator -->
-  <div id="offline-bar">📡 You're offline — ArthaSaathi still works! Data is saved locally.</div>
+<div id="splash">
+  <div class="splash-ring"></div>
+  <div class="splash-logo">ArthaSaathi</div>
+  <div class="splash-sub">Your Money Companion</div>
+</div>
 
-  <!-- Splash screen -->
-  <div id="splash">
-    <div class="splash-ring"></div>
-    <div class="splash-logo">ArthaSaathi</div>
-    <div class="splash-sub">Your Money Companion</div>
+<div id="root"></div>
+
+<div id="install-banner">
+  <div style="flex:1">
+    <div class="ib-title">📱 Add to Home Screen</div>
+    <div class="ib-sub">Use like a native app — works offline!</div>
   </div>
+  <button class="ib-btn" id="ib-btn">Install</button>
+  <button class="ib-x" id="ib-x">×</button>
+</div>
 
-  <!-- React app root -->
-  <div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+const { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } = Recharts;
 
-  <!-- Install to home screen banner -->
-  <div id="install-banner">
-    <div class="install-text">
-      <div class="install-title">📱 Add to Home Screen</div>
-      <div class="install-sub">Use ArthaSaathi like a native app — offline too!</div>
+// ── Constants ────────────────────────────────────────────────────────────────
+const CATEGORIES  = ["Food","Travel","Bills","EMI","Health","Education","Shopping","Other"];
+const CAT_COLORS  = ["#c9a84c","#3a6fd6","#2d8c64","#d64f3a","#9b59b6","#e67e22","#1abc9c","#7a7468"];
+const CAT_ICONS   = ["🍛","✈️","💡","🏦","💊","📚","🛍️","📦"];
+const MONTHS      = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const INC_SOURCES = ["Salary","Tuition Fees","Business","Freelance","Rental","Other"];
+const INC_ICONS   = ["💼","📚","🏢","💻","🏠","📦"];
+const GOAL_EMOJIS = ["🏠","🚗","✈️","📱","💍","🎓","🏥","💰","🌴","🎯"];
+const DEBT_TYPES  = ["Personal Loan","Home Loan","Car Loan","Credit Card","Family/Friend","Education Loan","Other"];
+const DEBT_ICONS  = ["👤","🏠","🚗","💳","👨‍👩‍👦","📚","📦"];
+
+const fmt      = n => "₹" + Number(n||0).toLocaleString("en-IN");
+const nowMonth = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; };
+const todayStr = () => new Date().toISOString().split("T")[0];
+const daysLeft = s => Math.max(0,Math.ceil((new Date(s)-Date.now())/(864e5)));
+const pct      = (a,b) => b>0?Math.min(100,Math.round(a/b*100)):0;
+const uid      = () => Math.random().toString(36).slice(2);
+const lsGet    = (k,d) => { try{return JSON.parse(localStorage.getItem(k))||d}catch{return d} };
+const lsSet    = (k,v) => localStorage.setItem(k,JSON.stringify(v));
+
+const IS = {width:"100%",padding:"11px 13px",borderRadius:12,fontSize:13.5,border:"1px solid var(--border)",background:"white",marginBottom:14,transition:"all 0.2s"};
+
+function calcDebtFree(debts) {
+  const left = debts.reduce((s,d)=>s+ +d.total- +d.paid,0);
+  if(left<=0) return null;
+  const mPay = debts.reduce((s,d)=>{
+    const m = d.dueDate?Math.max(1,daysLeft(d.dueDate)/30):12;
+    return s+(+d.total- +d.paid)/m;
+  },0);
+  if(mPay<=0) return null;
+  const mo = Math.ceil(left/mPay);
+  const dt = new Date(); dt.setMonth(dt.getMonth()+mo);
+  return dt.toLocaleDateString("en-IN",{month:"short",year:"numeric"});
+}
+
+// ── Shared Components ────────────────────────────────────────────────────────
+function Modal({title,onClose,children}) {
+  return <>
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(10,10,15,0.55)",zIndex:200,backdropFilter:"blur(5px)"}}/>
+    <div className="scale-in" style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"var(--cream)",borderRadius:"24px 24px 0 0",padding:"0 20px 36px",zIndex:201,boxShadow:"0 -20px 60px rgba(10,10,15,0.22)",maxHeight:"90vh",overflowY:"auto"}}>
+      <div style={{width:40,height:4,borderRadius:2,background:"#ddd",margin:"14px auto 18px"}}/>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+        <div className="display" style={{fontSize:22,fontWeight:600}}>{title}</div>
+        <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",fontSize:24,color:"var(--muted)"}}>×</button>
+      </div>
+      {children}
     </div>
-    <button class="install-btn" id="install-btn">Install</button>
-    <button class="install-dismiss" id="install-dismiss">×</button>
-  </div>
+  </>;
+}
 
-  <!-- Update available banner -->
-  <div id="update-banner" id="update-banner">
-    <span>🎉 New update available!</span>
-    <button class="update-btn" id="update-btn">Refresh</button>
-  </div>
+function Label({children}) {
+  return <div style={{fontSize:10.5,fontWeight:500,letterSpacing:1.8,textTransform:"uppercase",color:"var(--muted)",marginBottom:7}}>{children}</div>;
+}
 
-  <script>
-    // ── Service Worker Registration ──────────────────────────────────────────
-    let swRegistration = null;
-    let newWorker = null;
+function AmountInput({value,onChange,color}) {
+  return <div style={{marginBottom:18,background:"linear-gradient(135deg,#0a0a0f,#1a1a2e)",borderRadius:16,padding:"14px 18px"}}>
+    <div style={{color:"rgba(255,255,255,0.38)",fontSize:10,letterSpacing:2.5,marginBottom:5}}>AMOUNT (₹)</div>
+    <div style={{display:"flex",alignItems:"center",gap:6}}>
+      <span className="display" style={{fontSize:34,color:"rgba(255,255,255,0.25)",lineHeight:1}}>₹</span>
+      <input type="number" value={value} onChange={e=>onChange(e.target.value)} placeholder="0"
+        style={{background:"none",border:"none",color:color||"var(--gold-light)",fontSize:36,fontFamily:"Cormorant Garamond,serif",fontWeight:500,width:"100%",outline:"none"}}/>
+    </div>
+  </div>;
+}
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', async () => {
-        try {
-          swRegistration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-          console.log('[App] Service Worker registered:', swRegistration.scope);
+// ── Modals ───────────────────────────────────────────────────────────────────
+function AddExpenseModal({onClose,onAdd}) {
+  const [f,setF] = useState({amount:"",category:"Food",note:"",date:todayStr()});
+  const s=(k,v)=>setF(p=>({...p,[k]:v}));
+  return <Modal title="Add Expense" onClose={onClose}>
+    <AmountInput value={f.amount} onChange={v=>s("amount",v)} color="var(--red)"/>
+    <Label>Category</Label>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:7,marginBottom:16}}>
+      {CATEGORIES.map((c,i)=>(
+        <button key={c} onClick={()=>s("category",c)} style={{padding:"8px 3px",borderRadius:12,fontSize:10.5,fontWeight:500,border:f.category===c?"none":"1px solid var(--border)",background:f.category===c?"var(--ink)":"white",color:f.category===c?"var(--gold-light)":"var(--ink)",cursor:"pointer",transition:"all 0.15s",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+          <span>{CAT_ICONS[i]}</span><span>{c}</span>
+        </button>
+      ))}
+    </div>
+    <Label>Note</Label>
+    <input value={f.note} onChange={e=>s("note",e.target.value)} placeholder="e.g. Swiggy order" style={IS}/>
+    <Label>Date</Label>
+    <input type="date" value={f.date} onChange={e=>s("date",e.target.value)} style={IS}/>
+    <button className="btn-gold" onClick={()=>{if(!f.amount||+f.amount<=0)return;onAdd({...f,id:uid()})}} style={{width:"100%",padding:"14px",borderRadius:14,fontSize:15,marginTop:2}}>Save Expense</button>
+  </Modal>;
+}
 
-          // Check for updates on each load
-          swRegistration.addEventListener('updatefound', () => {
-            newWorker = swRegistration.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New version available — show update banner
-                document.getElementById('update-banner').classList.add('visible');
-              }
-            });
-          });
+function AddIncomeModal({onClose,onAdd}) {
+  const [f,setF] = useState({amount:"",source:"Salary",note:"",date:todayStr()});
+  const s=(k,v)=>setF(p=>({...p,[k]:v}));
+  return <Modal title="Record Income" onClose={onClose}>
+    <AmountInput value={f.amount} onChange={v=>s("amount",v)} color="var(--green)"/>
+    <Label>Source</Label>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:7,marginBottom:16}}>
+      {INC_SOURCES.map((src,i)=>(
+        <button key={src} onClick={()=>s("source",src)} style={{padding:"10px 4px",borderRadius:12,fontSize:11,fontWeight:500,border:f.source===src?"none":"1px solid var(--border)",background:f.source===src?"var(--ink)":"white",color:f.source===src?"var(--gold-light)":"var(--ink)",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+          <span>{INC_ICONS[i]}</span><span style={{fontSize:10}}>{src}</span>
+        </button>
+      ))}
+    </div>
+    <Label>Note</Label>
+    <input value={f.note} onChange={e=>s("note",e.target.value)} placeholder="e.g. March tuition fees" style={IS}/>
+    <Label>Date</Label>
+    <input type="date" value={f.date} onChange={e=>s("date",e.target.value)} style={IS}/>
+    <button className="btn-gold" onClick={()=>{if(!f.amount||+f.amount<=0)return;onAdd({...f,id:uid()})}} style={{width:"100%",padding:"14px",borderRadius:14,fontSize:15,background:"linear-gradient(135deg,#2d8c64,#3aad7e)",boxShadow:"0 4px 16px rgba(45,140,100,0.3)"}}>Save Income</button>
+  </Modal>;
+}
 
-          // Listen for controlling SW change → reload
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            window.location.reload();
-          });
+function AddDebtModal({onClose,onAdd}) {
+  const [f,setF] = useState({name:"",type:"Personal Loan",total:"",paid:"0",dueDate:""});
+  const s=(k,v)=>setF(p=>({...p,[k]:v}));
+  return <Modal title="Add Debt" onClose={onClose}>
+    <Label>Debt Name</Label>
+    <input value={f.name} onChange={e=>s("name",e.target.value)} placeholder="e.g. HDFC Personal Loan" style={IS}/>
+    <Label>Type</Label>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:7,marginBottom:16}}>
+      {DEBT_TYPES.slice(0,6).map((t,i)=>(
+        <button key={t} onClick={()=>s("type",t)} style={{padding:"9px 4px",borderRadius:12,fontSize:10,fontWeight:500,border:f.type===t?"none":"1px solid var(--border)",background:f.type===t?"var(--ink)":"white",color:f.type===t?"var(--gold-light)":"var(--ink)",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+          <span>{DEBT_ICONS[i]}</span><span style={{textAlign:"center",lineHeight:1.2}}>{t}</span>
+        </button>
+      ))}
+    </div>
+    <Label>Total Amount</Label>
+    <AmountInput value={f.total} onChange={v=>s("total",v)} color="var(--red)"/>
+    <Label>Already Paid</Label>
+    <input type="number" value={f.paid} onChange={e=>s("paid",e.target.value)} placeholder="0" style={IS}/>
+    <Label>Due Date (optional)</Label>
+    <input type="date" value={f.dueDate} onChange={e=>s("dueDate",e.target.value)} style={IS}/>
+    <button className="btn-gold" onClick={()=>{if(!f.name||!f.total||+f.total<=0)return;onAdd({...f,id:uid()})}} style={{width:"100%",padding:"14px",borderRadius:14,fontSize:15}}>Add Debt</button>
+  </Modal>;
+}
 
-        } catch (err) {
-          console.error('[App] Service Worker registration failed:', err);
-        }
-      });
-    }
+function PayDebtModal({debt,onClose,onPay}) {
+  const [amt,setAmt] = useState("");
+  if(!debt) return null;
+  const left = +debt.total - +debt.paid;
+  return <Modal title={`Pay · ${debt.name}`} onClose={onClose}>
+    <div style={{background:"var(--cream)",borderRadius:16,padding:"14px 16px",marginBottom:16,display:"flex",justifyContent:"space-between"}}>
+      <div><div style={{fontSize:10,color:"var(--muted)",letterSpacing:1.5,textTransform:"uppercase"}}>Remaining</div>
+      <div className="display" style={{fontSize:28,fontWeight:600,color:"var(--red)"}}>{fmt(left)}</div></div>
+      <div style={{textAlign:"right"}}><div style={{fontSize:10,color:"var(--muted)",letterSpacing:1.5,textTransform:"uppercase"}}>Paid</div>
+      <div className="display" style={{fontSize:28,fontWeight:600,color:"var(--green)"}}>{pct(+debt.paid,+debt.total)}%</div></div>
+    </div>
+    <AmountInput value={amt} onChange={setAmt} color="var(--green)"/>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16}}>
+      {[500,1000,5000].map(q=>(
+        <button key={q} onClick={()=>setAmt(String(Math.min(q,left)))} style={{padding:"8px",borderRadius:12,border:"1px solid var(--border)",background:"white",cursor:"pointer",fontSize:12,fontWeight:500}}>{fmt(q)}</button>
+      ))}
+    </div>
+    <button className="btn-gold" onClick={()=>{if(!amt||+amt<=0)return;onPay(debt.id,Math.min(+amt,left))}} style={{width:"100%",padding:"14px",borderRadius:14,fontSize:15,background:"linear-gradient(135deg,#2d8c64,#3aad7e)",boxShadow:"0 4px 16px rgba(45,140,100,0.3)"}}>Record Payment 💪</button>
+  </Modal>;
+}
 
-    // ── Update button ────────────────────────────────────────────────────────
-    document.getElementById('update-btn').addEventListener('click', () => {
-      if (newWorker) newWorker.postMessage({ type: 'SKIP_WAITING' });
-    });
+function AddGoalModal({onClose,onAdd}) {
+  const [f,setF] = useState({name:"",emoji:"🎯",target:"",saved:"0",deadline:""});
+  const s=(k,v)=>setF(p=>({...p,[k]:v}));
+  return <Modal title="New Savings Goal" onClose={onClose}>
+    <Label>Goal Name</Label>
+    <input value={f.name} onChange={e=>s("name",e.target.value)} placeholder="e.g. Emergency Fund" style={IS}/>
+    <Label>Choose Emoji</Label>
+    <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
+      {GOAL_EMOJIS.map(em=>(
+        <button key={em} onClick={()=>s("emoji",em)} style={{width:40,height:40,borderRadius:12,border:f.emoji===em?"2px solid var(--gold)":"1px solid var(--border)",background:f.emoji===em?"var(--gold-pale)":"white",fontSize:20,cursor:"pointer"}}>{em}</button>
+      ))}
+    </div>
+    <Label>Target Amount</Label>
+    <AmountInput value={f.target} onChange={v=>s("target",v)} color="var(--purple)"/>
+    <Label>Already Saved</Label>
+    <input type="number" value={f.saved} onChange={e=>s("saved",e.target.value)} placeholder="0" style={IS}/>
+    <Label>Deadline (optional)</Label>
+    <input type="date" value={f.deadline} onChange={e=>s("deadline",e.target.value)} style={IS}/>
+    <button onClick={()=>{if(!f.name||!f.target||+f.target<=0)return;onAdd({...f,id:uid()})}} style={{width:"100%",padding:"14px",borderRadius:14,fontSize:15,fontWeight:600,background:"linear-gradient(135deg,#7c5cbf,#a07ce8)",color:"white",border:"none",cursor:"pointer",boxShadow:"0 4px 16px rgba(124,92,191,0.35)"}}>Create Goal 🎯</button>
+  </Modal>;
+}
 
-    // ── PWA Install Prompt ───────────────────────────────────────────────────
-    let deferredPrompt = null;
-    const installBanner  = document.getElementById('install-banner');
-    const installBtn     = document.getElementById('install-btn');
-    const installDismiss = document.getElementById('install-dismiss');
+function AddGoalFundModal({goal,onClose,onAdd}) {
+  const [amt,setAmt] = useState("");
+  if(!goal) return null;
+  const left = Math.max(0,+goal.target - +goal.saved);
+  return <Modal title={`Add Savings · ${goal.emoji} ${goal.name}`} onClose={onClose}>
+    <div style={{background:"var(--cream)",borderRadius:16,padding:"14px 16px",marginBottom:16,display:"flex",justifyContent:"space-between"}}>
+      <div><div style={{fontSize:10,color:"var(--muted)",letterSpacing:1.5,textTransform:"uppercase"}}>Saved</div>
+      <div className="display" style={{fontSize:28,fontWeight:600,color:"var(--purple)"}}>{fmt(goal.saved)}</div></div>
+      <div style={{textAlign:"right"}}><div style={{fontSize:10,color:"var(--muted)",letterSpacing:1.5,textTransform:"uppercase"}}>Remaining</div>
+      <div className="display" style={{fontSize:28,fontWeight:600,color:"var(--muted)"}}>{fmt(left)}</div></div>
+    </div>
+    <AmountInput value={amt} onChange={setAmt} color="var(--purple)"/>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16}}>
+      {[500,1000,5000].map(q=>(
+        <button key={q} onClick={()=>setAmt(String(Math.min(q,left)))} style={{padding:"8px",borderRadius:12,border:"1px solid var(--border)",background:"white",cursor:"pointer",fontSize:12,fontWeight:500}}>{fmt(q)}</button>
+      ))}
+    </div>
+    <button onClick={()=>{if(!amt||+amt<=0)return;onAdd(goal.id,Math.min(+amt,left))}} style={{width:"100%",padding:"14px",borderRadius:14,fontSize:15,fontWeight:600,background:"linear-gradient(135deg,#7c5cbf,#a07ce8)",color:"white",border:"none",cursor:"pointer",boxShadow:"0 4px 16px rgba(124,92,191,0.35)"}}>Add to Goal 🌟</button>
+  </Modal>;
+}
 
-    window.addEventListener('beforeinstallprompt', e => {
-      e.preventDefault();
-      deferredPrompt = e;
+function BudgetModal({budgets,setBudgets,onClose}) {
+  const [local,setLocal] = useState({...budgets});
+  return <Modal title="Monthly Budgets" onClose={onClose}>
+    <div style={{color:"var(--muted)",fontSize:12,marginBottom:16}}>Set per-category limits to stay on track</div>
+    {CATEGORIES.map((cat,i)=>(
+      <div key={cat} style={{display:"flex",alignItems:"center",gap:12,marginBottom:11}}>
+        <div style={{width:36,height:36,borderRadius:10,background:`${CAT_COLORS[i]}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>{CAT_ICONS[i]}</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:12,fontWeight:500,marginBottom:3}}>{cat}</div>
+          <input type="number" placeholder="No limit" value={local[cat]||""} onChange={e=>setLocal(b=>({...b,[cat]:e.target.value}))} style={{...IS,marginBottom:0,padding:"7px 11px",fontSize:13}}/>
+        </div>
+      </div>
+    ))}
+    <button className="btn-gold" onClick={()=>setBudgets(local)} style={{width:"100%",padding:"14px",borderRadius:14,fontSize:15,marginTop:10}}>Save Budgets</button>
+  </Modal>;
+}
 
-      // Show banner after 3 seconds (don't interrupt immediately)
-      const dismissed = localStorage.getItem('as_install_dismissed');
-      if (!dismissed) {
-        setTimeout(() => installBanner.classList.add('visible'), 3000);
-      }
-    });
+// ── Dashboard ────────────────────────────────────────────────────────────────
+function Dashboard({bal,totEx,totIn,mExp,setTab,setModal,budgets,debts,goals,totalDebt,totalPaid}) {
+  const catData = CATEGORIES.map((c,i)=>({name:c,value:mExp.filter(e=>e.category===c).reduce((s,e)=>s+ +e.amount,0),color:CAT_COLORS[i]})).filter(d=>d.value>0);
+  const debtPct = pct(totalPaid,totalDebt);
+  const topDebt = [...debts].sort((a,b)=>(+b.total- +b.paid)-(+a.total- +a.paid))[0];
+  return <div>
+    {/* Balance hero */}
+    <div className="fade-up-1" style={{background:"linear-gradient(135deg,#0a0a0f,#1a1a2e)",borderRadius:24,padding:"26px 22px 22px",marginBottom:18,boxShadow:"0 16px 48px rgba(10,10,15,0.28)",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",top:-50,right:-50,width:160,height:160,borderRadius:"50%",background:"rgba(201,168,76,0.05)",border:"1px solid rgba(201,168,76,0.08)"}}/>
+      <div style={{color:"rgba(255,255,255,0.42)",fontSize:10,letterSpacing:2.5,textTransform:"uppercase",marginBottom:7}}>Net Balance · {MONTHS[new Date().getMonth()]} {new Date().getFullYear()}</div>
+      <div className="display" style={{fontSize:46,fontWeight:300,color:bal>=0?"#e8c97a":"#d64f3a",lineHeight:1,letterSpacing:"-1px"}}>
+        {fmt(Math.abs(bal))}<span style={{fontSize:20,marginLeft:6,opacity:0.6}}>{bal>=0?"↑":"↓"}</span>
+      </div>
+      <div style={{color:"rgba(255,255,255,0.35)",fontSize:11,marginTop:4}}>{bal>=0?"Surplus this month":"Deficit this month"}</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:22}}>
+        {[{l:"Income",v:fmt(totIn),i:"↑"},{l:"Expenses",v:fmt(totEx),i:"↓"}].map(x=>(
+          <div key={x.l} style={{background:"rgba(255,255,255,0.06)",borderRadius:14,padding:"12px 14px",border:"1px solid rgba(255,255,255,0.07)"}}>
+            <div style={{color:"rgba(255,255,255,0.38)",fontSize:10,letterSpacing:1.5,textTransform:"uppercase"}}>{x.i} {x.l}</div>
+            <div className="display" style={{color:"white",fontSize:22,fontWeight:500,marginTop:4}}>{x.v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
 
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      installBanner.classList.remove('visible');
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log('[App] Install outcome:', outcome);
-      deferredPrompt = null;
-      if (outcome === 'accepted') {
-        localStorage.setItem('as_install_dismissed', 'true');
-      }
-    });
+    {/* Quick actions */}
+    <div className="fade-up-2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:18}}>
+      <button className="btn-gold" onClick={()=>setModal("expense")} style={{padding:"13px",borderRadius:16,fontSize:13}}>+ Add Expense</button>
+      <button onClick={()=>setModal("budget")} style={{padding:"13px",borderRadius:16,fontSize:13,fontWeight:600,background:"var(--ink)",color:"var(--gold-light)",border:"none",cursor:"pointer"}}>⚙ Budgets</button>
+    </div>
 
-    installDismiss.addEventListener('click', () => {
-      installBanner.classList.remove('visible');
-      localStorage.setItem('as_install_dismissed', 'true');
-    });
+    {/* Debt widget */}
+    {debts.length>0 && <div className="card fade-up-3" onClick={()=>setTab("karza")} style={{padding:"18px 20px",marginBottom:14,cursor:"pointer",borderLeft:"3px solid var(--red)"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+        <div><div style={{fontSize:10,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)",marginBottom:3}}>⛓ Karza Mukti</div>
+        <div className="display" style={{fontSize:20,fontWeight:600}}>{debtPct}% Paid Off</div></div>
+        <div style={{textAlign:"right"}}><div style={{fontSize:11,color:"var(--muted)"}}>Remaining</div>
+        <div style={{fontSize:18,fontWeight:700,color:"var(--red)",fontFamily:"Cormorant Garamond,serif"}}>{fmt(totalDebt-totalPaid)}</div></div>
+      </div>
+      <div style={{background:"#f0ece4",borderRadius:20,height:7,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${debtPct}%`,background:"linear-gradient(90deg,#d64f3a,#e8826e)",borderRadius:20}}/>
+      </div>
+      {topDebt&&<div style={{fontSize:11,color:"var(--muted)",marginTop:8}}>Largest: {topDebt.name} · {fmt(+topDebt.total- +topDebt.paid)} left</div>}
+    </div>}
 
-    // Hide banner if already installed
-    window.addEventListener('appinstalled', () => {
-      installBanner.classList.remove('visible');
-      deferredPrompt = null;
-      console.log('[App] ArthaSaathi installed to home screen!');
-    });
+    {/* Goals widget */}
+    {goals.length>0 && <div className="card fade-up-4" onClick={()=>setTab("goals")} style={{padding:"18px 20px",marginBottom:14,cursor:"pointer",borderLeft:"3px solid var(--purple)"}}>
+      <div style={{fontSize:10,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)",marginBottom:10}}>◎ Savings Goals</div>
+      {goals.slice(0,2).map((g,i)=>(
+        <div key={i} style={{marginBottom:i<Math.min(goals.length,2)-1?12:0}}>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:5}}>
+            <span style={{fontWeight:500}}>{g.emoji} {g.name}</span>
+            <span style={{color:"var(--muted)"}}>{fmt(g.saved)} / {fmt(g.target)}</span>
+          </div>
+          <div style={{background:"#f0ece4",borderRadius:20,height:5,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${pct(+g.saved,+g.target)}%`,background:"linear-gradient(90deg,var(--purple),#a07ce8)",borderRadius:20}}/>
+          </div>
+        </div>
+      ))}
+    </div>}
 
-    // ── Offline / Online detection ───────────────────────────────────────────
-    function updateOnlineStatus() {
-      document.body.classList.toggle('offline', !navigator.onLine);
-    }
-    window.addEventListener('online',  updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    updateOnlineStatus();
+    {/* Category breakdown */}
+    {catData.length>0 && <div className="card fade-up-5" style={{padding:"18px 20px"}}>
+      <div className="display" style={{fontSize:18,fontWeight:600,marginBottom:14}}>This Month</div>
+      <div style={{display:"flex",alignItems:"center",gap:14}}>
+        <PieChart width={108} height={108}>
+          <Pie data={catData} cx={50} cy={50} innerRadius={28} outerRadius={50} dataKey="value" strokeWidth={0}>
+            {catData.map((e,i)=><Cell key={i} fill={e.color}/>)}
+          </Pie>
+        </PieChart>
+        <div style={{flex:1,display:"flex",flexDirection:"column",gap:7}}>
+          {catData.slice(0,5).map((d,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:7}}>
+              <div style={{width:7,height:7,borderRadius:"50%",background:d.color,flexShrink:0}}/>
+              <span style={{fontSize:11.5,flex:1,color:"var(--muted)"}}>{d.name}</span>
+              <span style={{fontSize:11.5,fontWeight:600}}>{fmt(d.value)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>}
 
-    // ── Splash hide (after React mounts) ────────────────────────────────────
-    // React will call window.hideSplash() when it's ready
-    window.hideSplash = () => {
-      const splash = document.getElementById('splash');
-      splash.classList.add('hidden');
-      setTimeout(() => splash.remove(), 600);
-    };
+    {catData.length===0&&debts.length===0&&goals.length===0&&<div className="fade-up-3" style={{textAlign:"center",padding:"48px 20px",color:"var(--muted)"}}>
+      <div style={{fontSize:52,marginBottom:12}}>₹</div>
+      <div className="display" style={{fontSize:22,marginBottom:6}}>Welcome to ArthaSaathi</div>
+      <div style={{fontSize:13}}>Tap + to log your first expense</div>
+    </div>}
+  </div>;
+}
 
-    // Fallback: hide splash after 3s even if React is slow
-    setTimeout(() => {
-      const splash = document.getElementById('splash');
-      if (splash) splash.classList.add('hidden');
-    }, 3000);
+// ── Karza Tab ────────────────────────────────────────────────────────────────
+function KarzaTab({debts,setDeb,setModal,showToast}) {
+  const totalDebt=debts.reduce((s,d)=>s+ +d.total,0);
+  const totalPaid=debts.reduce((s,d)=>s+ +d.paid,0);
+  const remaining=totalDebt-totalPaid;
+  const debtPct=pct(totalPaid,totalDebt);
+  const isFree=debts.length>0&&remaining===0;
+  const del=id=>{setDeb(p=>p.filter(d=>d.id!==id));showToast("Debt removed")};
 
-    // ── Handle shortcuts from manifest ──────────────────────────────────────
-    const params = new URLSearchParams(window.location.search);
-    const action = params.get('action');
-    if (action) {
-      window.__AS_LAUNCH_ACTION__ = action;
-      // React app reads window.__AS_LAUNCH_ACTION__ on mount
-    }
+  return <div>
+    <div className="fade-up-1" style={{background:isFree?"linear-gradient(135deg,#1a3a2a,#0d2218)":"linear-gradient(135deg,#1a0f0f,#2e1010)",borderRadius:24,padding:"26px 22px 22px",marginBottom:18,boxShadow:"0 16px 48px rgba(10,10,15,0.28)",position:"relative",overflow:"hidden"}}>
+      {isFree?<div style={{textAlign:"center",padding:"8px 0"}}>
+        <div style={{fontSize:56}}>🎉</div>
+        <div className="display" style={{fontSize:32,fontWeight:600,color:"#e8c97a",marginTop:8}}>Karza Mukt!</div>
+        <div style={{color:"rgba(255,255,255,0.5)",fontSize:13,marginTop:6}}>You are completely debt-free!</div>
+      </div>:<>
+        <div style={{color:"rgba(255,255,255,0.4)",fontSize:10,letterSpacing:2.5,textTransform:"uppercase",marginBottom:7}}>⛓ Karza Mukti — Debt Freedom</div>
+        <div className="display" style={{fontSize:44,fontWeight:300,color:"#e88e7a",letterSpacing:"-1px",lineHeight:1}}>{fmt(remaining)}</div>
+        <div style={{color:"rgba(255,255,255,0.35)",fontSize:11,marginTop:4}}>remaining of {fmt(totalDebt)}</div>
+        <div style={{marginTop:18}}>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"rgba(255,255,255,.45)",marginBottom:6}}><span>Paid: {fmt(totalPaid)}</span><span>{debtPct}% done</span></div>
+          <div style={{background:"rgba(255,255,255,0.1)",borderRadius:20,height:8,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${debtPct}%`,background:"linear-gradient(90deg,#d64f3a,#e8826e)",borderRadius:20}}/>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:8,marginTop:16}}>
+          {[25,50,75,100].map(m=>(
+            <div key={m} className={debtPct>=m?"milestone-badge":""} style={{flex:1,padding:"7px 4px",borderRadius:10,textAlign:"center",background:debtPct>=m?"rgba(201,168,76,0.2)":"rgba(255,255,255,0.06)",border:`1px solid ${debtPct>=m?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.06)"}`}}>
+              <div style={{fontSize:14}}>{m===100?"🏆":m===75?"🥈":m===50?"🥉":"🎯"}</div>
+              <div style={{fontSize:9,color:debtPct>=m?"#e8c97a":"rgba(255,255,255,0.3)",marginTop:2}}>{m}%</div>
+            </div>
+          ))}
+        </div>
+      </>}
+    </div>
 
-    // ── iOS standalone detection ─────────────────────────────────────────────
-    const isIosStandalone = window.navigator.standalone === true;
-    if (isIosStandalone) {
-      document.body.classList.add('ios-standalone');
-      console.log('[App] Running in iOS standalone mode');
-    }
-  </script>
+    {debts.length===0?<div className="fade-up-2" style={{textAlign:"center",padding:"48px 20px",color:"var(--muted)"}}>
+      <div style={{fontSize:52,marginBottom:12}}>🕊️</div>
+      <div className="display" style={{fontSize:22,marginBottom:6}}>No debts recorded</div>
+      <div style={{fontSize:13}}>Tap + to start your freedom journey</div>
+    </div>:debts.map((d,i)=>{
+      const left=+d.total- +d.paid; const dp=pct(+d.paid,+d.total);
+      return <div key={d.id} className={`card debt-card fade-up-${Math.min(i+2,5)}`} style={{padding:"18px",marginBottom:14}}>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:14}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:44,height:44,borderRadius:14,background:"#d64f3a14",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{DEBT_ICONS[DEBT_TYPES.indexOf(d.type)]||"📦"}</div>
+            <div><div style={{fontSize:15,fontWeight:600}}>{d.name}</div><div style={{fontSize:11,color:"var(--muted)"}}>{d.type}{d.dueDate?` · Due ${d.dueDate}`:""}</div></div>
+          </div>
+          <button onClick={()=>del(d.id)} className="del-btn" style={{background:"none",border:"none",color:"var(--muted)",fontSize:18,padding:"2px 6px"}}>×</button>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>
+          {[{l:"Total",v:fmt(d.total),c:"var(--ink)"},{l:"Paid",v:fmt(d.paid),c:"var(--green)"},{l:"Left",v:fmt(left),c:"var(--red)"}].map(x=>(
+            <div key={x.l} style={{background:"var(--cream)",borderRadius:12,padding:"10px",textAlign:"center"}}>
+              <div style={{fontSize:9.5,color:"var(--muted)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:3}}>{x.l}</div>
+              <div style={{fontSize:13,fontWeight:700,color:x.c,fontFamily:"Cormorant Garamond,serif"}}>{x.v}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{marginBottom:14}}>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"var(--muted)",marginBottom:5}}><span>Progress</span><span>{dp}%</span></div>
+          <div style={{background:"#f0ece4",borderRadius:20,height:7,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${dp}%`,background:"linear-gradient(90deg,#d64f3a,#e8826e)",borderRadius:20}}/>
+          </div>
+        </div>
+        {left>0?<button className="btn-gold" onClick={()=>setModal(`payDebt:${d.id}`)} style={{width:"100%",padding:"11px",borderRadius:14,fontSize:13}}>+ Record Payment</button>
+        :<div style={{background:"#2d8c6415",borderRadius:14,padding:"10px",textAlign:"center",color:"var(--green)",fontWeight:600,fontSize:13}}>✓ Paid Off! 🎉</div>}
+      </div>;
+    })}
+  </div>;
+}
 
-  <!--
-  ╔══════════════════════════════════════════════════════════╗
-  ║  DEVELOPER NOTE — Integrating with React                 ║
-  ║                                                          ║
-  ║  In your React build (Vite/CRA), this index.html is      ║
-  ║  your public/index.html template. The React bundle       ║
-  ║  mounts at <div id="root">.                              ║
-  ║                                                          ║
-  ║  In your App.jsx root component, add:                    ║
-  ║                                                          ║
-  ║  useEffect(() => {                                       ║
-  ║    window.hideSplash?.();                                ║
-  ║    // Handle launch action:                              ║
-  ║    if (window.__AS_LAUNCH_ACTION__ === 'add-expense') {  ║
-  ║      setModal('expense');                                ║
-  ║    }                                                     ║
-  ║  }, []);                                                 ║
-  ╚══════════════════════════════════════════════════════════╝
-  -->
+// ── Goals Tab ────────────────────────────────────────────────────────────────
+function GoalsTab({goals,setGoa,setModal,showToast}) {
+  const del=id=>{setGoa(p=>p.filter(g=>g.id!==id));showToast("Goal removed")};
+  return <div>
+    <div className="fade-up-1" style={{marginBottom:20}}>
+      <div className="display" style={{fontSize:28,fontWeight:600}}>Savings Goals</div>
+      <div style={{color:"var(--muted)",fontSize:13,marginTop:2}}>{goals.length} active goal{goals.length!==1?"s":""}</div>
+    </div>
+    {goals.length===0?<div className="fade-up-2" style={{textAlign:"center",padding:"52px 20px",color:"var(--muted)"}}>
+      <div style={{fontSize:52,marginBottom:12}}>🎯</div>
+      <div className="display" style={{fontSize:22,marginBottom:6}}>No goals yet</div>
+      <div style={{fontSize:13}}>Tap + to create your first savings goal</div>
+    </div>:goals.map((g,i)=>{
+      const dp=pct(+g.saved,+g.target); const left=Math.max(0,+g.target- +g.saved); const done=left===0;
+      const dl=g.deadline?daysLeft(g.deadline):null;
+      return <div key={g.id} className={`card goal-card fade-up-${Math.min(i+1,5)}`} style={{padding:"20px",marginBottom:14,borderLeft:`3px solid ${done?"var(--green)":"var(--purple)"}`}}>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:14}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:48,height:48,borderRadius:16,background:done?"#2d8c6415":"#7c5cbf14",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>{g.emoji}</div>
+            <div><div style={{fontSize:15,fontWeight:600}}>{g.name}</div>
+            <div style={{fontSize:11,color:"var(--muted)"}}>{dl!==null?(done?"Completed! 🎉":`${dl} days left`):"No deadline"}</div></div>
+          </div>
+          <button onClick={()=>del(g.id)} className="del-btn" style={{background:"none",border:"none",color:"var(--muted)",fontSize:18,padding:"2px 6px"}}>×</button>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:10}}>
+          <div><div style={{fontSize:10,color:"var(--muted)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:3}}>Saved</div>
+          <div className="display" style={{fontSize:28,fontWeight:600,color:done?"var(--green)":"var(--purple)",lineHeight:1}}>{fmt(g.saved)}</div></div>
+          <div style={{textAlign:"right"}}><div style={{fontSize:10,color:"var(--muted)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:3}}>Target</div>
+          <div className="display" style={{fontSize:20,fontWeight:500,color:"var(--muted)",lineHeight:1}}>{fmt(g.target)}</div></div>
+        </div>
+        <div style={{marginBottom:14}}>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"var(--muted)",marginBottom:6}}>
+            <span>{left>0?`${fmt(left)} to go`:""}</span>
+            <span style={{fontWeight:600,color:done?"var(--green)":"var(--purple)"}}>{dp}%</span>
+          </div>
+          <div style={{background:"#f0ece4",borderRadius:20,height:8,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${dp}%`,borderRadius:20,background:done?"linear-gradient(90deg,#2d8c64,#3aad7e)":"linear-gradient(90deg,#7c5cbf,#a07ce8)"}}/>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:6,marginBottom:14}}>
+          {[25,50,75,100].map(m=>(
+            <div key={m} style={{flex:1,padding:"5px 2px",borderRadius:8,textAlign:"center",background:dp>=m?(done?"#2d8c6422":"#7c5cbf22"):"var(--cream)",border:`1px solid ${dp>=m?(done?"rgba(45,140,100,0.3)":"rgba(124,92,191,0.3)"):"var(--border)"}`,fontSize:9.5,color:dp>=m?(done?"var(--green)":"var(--purple)"):"var(--muted)"}}>{m}%</div>
+          ))}
+        </div>
+        {!done?<button onClick={()=>setModal(`addFund:${g.id}`)} style={{width:"100%",padding:"11px",borderRadius:14,fontSize:13,fontWeight:600,background:"linear-gradient(135deg,#7c5cbf,#a07ce8)",color:"white",border:"none",cursor:"pointer",boxShadow:"0 4px 16px rgba(124,92,191,0.3)"}}>+ Add Savings</button>
+        :<div style={{background:"#2d8c6415",borderRadius:14,padding:"10px",textAlign:"center",color:"var(--green)",fontWeight:600,fontSize:13}}>✓ Goal Achieved! 🏆</div>}
+      </div>;
+    })}
+  </div>;
+}
 
+// ── Expenses Tab ─────────────────────────────────────────────────────────────
+function ExpensesTab({expenses,setEx,showToast}) {
+  const [filter,setFilter]=useState("All");
+  const cur=nowMonth(); const mE=expenses.filter(e=>e.date.startsWith(cur));
+  const fil=filter==="All"?mE:mE.filter(e=>e.category===filter);
+  const tot=fil.reduce((s,e)=>s+ +e.amount,0);
+  const del=idx=>{const ri=expenses.indexOf(fil[idx]);setEx(p=>p.filter((_,i)=>i!==ri));showToast("Deleted")};
+  return <div>
+    <div className="fade-up-1" style={{marginBottom:18}}>
+      <div className="display" style={{fontSize:28,fontWeight:600}}>Expenses</div>
+      <div style={{color:"var(--muted)",fontSize:13,marginTop:2}}>{MONTHS[new Date().getMonth()]} — <span style={{color:"var(--red)",fontWeight:700}}>{fmt(tot)}</span></div>
+    </div>
+    <div className="fade-up-2" style={{display:"flex",gap:7,overflowX:"auto",marginBottom:18,paddingBottom:4}}>
+      {["All",...CATEGORIES].map(c=>(
+        <button key={c} onClick={()=>setFilter(c)} style={{padding:"6px 13px",borderRadius:20,fontSize:11.5,whiteSpace:"nowrap",border:"1px solid var(--border)",cursor:"pointer",fontWeight:500,background:filter===c?"var(--ink)":"white",color:filter===c?"var(--gold-light)":"var(--ink)",transition:"all 0.18s"}}>{c}</button>
+      ))}
+    </div>
+    <div className="card fade-up-3" style={{padding:"6px 12px"}}>
+      {fil.length===0?<div style={{padding:"40px",textAlign:"center",color:"var(--muted)"}}>No expenses this month</div>
+      :fil.map((e,i)=>(
+        <div key={i} className="entry-row" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 6px",borderBottom:i<fil.length-1?"1px solid var(--border)":"none"}}>
+          <div style={{display:"flex",alignItems:"center",gap:11}}>
+            <div style={{width:40,height:40,borderRadius:12,background:`${CAT_COLORS[CATEGORIES.indexOf(e.category)]}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>{CAT_ICONS[CATEGORIES.indexOf(e.category)]}</div>
+            <div><div style={{fontSize:13,fontWeight:500}}>{e.note||e.category}</div><div style={{fontSize:11,color:"var(--muted)"}}>{e.category} · {e.date.slice(5)}</div></div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:9}}>
+            <div style={{fontSize:14,fontWeight:700,color:"var(--red)"}}>-{fmt(e.amount)}</div>
+            <button className="del-btn" onClick={()=>del(i)} style={{background:"none",border:"none",color:"var(--muted)",fontSize:17,padding:"4px"}}>×</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>;
+}
+
+// ── Income Tab ───────────────────────────────────────────────────────────────
+function IncomeTab({incomes,setInc,showToast}) {
+  const cur=nowMonth(); const mI=incomes.filter(i=>i.date.startsWith(cur));
+  const tot=mI.reduce((s,i)=>s+ +i.amount,0);
+  const del=idx=>{const ri=incomes.indexOf(mI[idx]);setInc(p=>p.filter((_,i)=>i!==ri));showToast("Deleted")};
+  return <div>
+    <div className="fade-up-1" style={{marginBottom:18}}>
+      <div className="display" style={{fontSize:28,fontWeight:600}}>Income</div>
+      <div style={{color:"var(--muted)",fontSize:13,marginTop:2}}>{MONTHS[new Date().getMonth()]} — <span style={{color:"var(--green)",fontWeight:700}}>{fmt(tot)}</span></div>
+    </div>
+    <div className="card fade-up-2" style={{padding:"6px 12px"}}>
+      {mI.length===0?<div style={{padding:"40px",textAlign:"center",color:"var(--muted)"}}>
+        <div style={{fontSize:40,marginBottom:8}}>📥</div>No income recorded this month
+      </div>:mI.map((inc,i)=>(
+        <div key={i} className="entry-row" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 6px",borderBottom:i<mI.length-1?"1px solid var(--border)":"none"}}>
+          <div style={{display:"flex",alignItems:"center",gap:11}}>
+            <div style={{width:40,height:40,borderRadius:12,background:"#2d8c6415",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>{INC_ICONS[INC_SOURCES.indexOf(inc.source)]||"📦"}</div>
+            <div><div style={{fontSize:13,fontWeight:500}}>{inc.note||inc.source}</div><div style={{fontSize:11,color:"var(--muted)"}}>{inc.source} · {inc.date.slice(5)}</div></div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:9}}>
+            <div style={{fontSize:14,fontWeight:700,color:"var(--green)"}}>+{fmt(inc.amount)}</div>
+            <button className="del-btn" onClick={()=>del(i)} style={{background:"none",border:"none",color:"var(--muted)",fontSize:17,padding:"4px"}}>×</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>;
+}
+
+// ── Reports Tab ──────────────────────────────────────────────────────────────
+function ReportsTab({expenses,incomes}) {
+  const now=new Date();
+  const last6=Array.from({length:6},(_,i)=>{
+    const d=new Date(now.getFullYear(),now.getMonth()-5+i,1);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+    return{name:MONTHS[d.getMonth()],income:incomes.filter(x=>x.date.startsWith(key)).reduce((s,x)=>s+ +x.amount,0),expense:expenses.filter(x=>x.date.startsWith(key)).reduce((s,x)=>s+ +x.amount,0)};
+  });
+  const cur=nowMonth(); const mE=expenses.filter(e=>e.date.startsWith(cur));
+  const totEx=mE.reduce((s,e)=>s+ +e.amount,0);
+  const totIn=incomes.filter(i=>i.date.startsWith(cur)).reduce((s,i)=>s+ +i.amount,0);
+  const sr=totIn>0?Math.round((totIn-totEx)/totIn*100):0;
+  const catData=CATEGORIES.map((c,i)=>({name:c,value:mE.filter(e=>e.category===c).reduce((s,e)=>s+ +e.amount,0),color:CAT_COLORS[i]})).filter(d=>d.value>0);
+  return <div>
+    <div className="fade-up-1" style={{marginBottom:20}}>
+      <div className="display" style={{fontSize:28,fontWeight:600}}>Reports</div>
+      <div style={{color:"var(--muted)",fontSize:13,marginTop:2}}>Financial overview</div>
+    </div>
+    <div className="fade-up-2 card" style={{padding:"20px",marginBottom:16,background:"linear-gradient(135deg,#0a0a0f,#1a1a2e)",border:"none"}}>
+      <div style={{color:"rgba(255,255,255,0.5)",fontSize:11,letterSpacing:2,textTransform:"uppercase"}}>Savings Rate</div>
+      <div className="display" style={{fontSize:48,fontWeight:300,color:sr>=20?"#e8c97a":"#d64f3a",lineHeight:1.2}}>{sr}%</div>
+      <div style={{marginTop:12,background:"rgba(255,255,255,0.1)",borderRadius:20,height:6,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${Math.max(0,Math.min(100,sr))}%`,background:"linear-gradient(90deg,var(--gold),var(--gold-light))",borderRadius:20}}/>
+      </div>
+      <div style={{color:"rgba(255,255,255,0.4)",fontSize:11,marginTop:8}}>{sr>=20?"✓ Healthy savings rate":"Aim for 20%+ savings rate"}</div>
+    </div>
+    <div className="card fade-up-3" style={{padding:"20px",marginBottom:16}}>
+      <div className="display" style={{fontSize:18,fontWeight:600,marginBottom:16}}>6-Month Comparison</div>
+      <ResponsiveContainer width="100%" height={160}>
+        <BarChart data={last6} barSize={10} barGap={3}>
+          <XAxis dataKey="name" tick={{fontSize:10,fill:"#7a7468"}} axisLine={false} tickLine={false}/>
+          <YAxis hide/>
+          <Tooltip contentStyle={{borderRadius:10,border:"1px solid var(--border)",fontSize:12}} formatter={v=>fmt(v)}/>
+          <Bar dataKey="income" fill="#2d8c64" radius={[4,4,0,0]} name="Income"/>
+          <Bar dataKey="expense" fill="#d64f3a" radius={[4,4,0,0]} name="Expense"/>
+        </BarChart>
+      </ResponsiveContainer>
+      <div style={{display:"flex",gap:16,marginTop:8}}>
+        {[{c:"#2d8c64",l:"Income"},{c:"#d64f3a",l:"Expense"}].map(x=>(
+          <div key={x.l} style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"var(--muted)"}}>
+            <div style={{width:10,height:10,borderRadius:2,background:x.c}}/>{x.l}
+          </div>
+        ))}
+      </div>
+    </div>
+    {catData.length>0&&<div className="card fade-up-4" style={{padding:"20px"}}>
+      <div className="display" style={{fontSize:18,fontWeight:600,marginBottom:16}}>Category Breakdown</div>
+      {[...catData].sort((a,b)=>b.value-a.value).map((d,i)=>(
+        <div key={i} style={{marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:5}}>
+            <span style={{fontWeight:500}}>{d.name}</span>
+            <span style={{color:"var(--muted)"}}>{fmt(d.value)} <span style={{fontSize:10}}>({Math.round(d.value/totEx*100)}%)</span></span>
+          </div>
+          <div style={{background:"#f0ece4",borderRadius:20,height:6,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${Math.round(d.value/totEx*100)}%`,background:d.color,borderRadius:20}}/>
+          </div>
+        </div>
+      ))}
+    </div>}
+  </div>;
+}
+
+// ── Root App ─────────────────────────────────────────────────────────────────
+function App() {
+  const [tab,setTab]     = useState("dashboard");
+  const [expenses,setEx] = useState(()=>lsGet("as_exp",[]));
+  const [incomes,setInc] = useState(()=>lsGet("as_inc",[]));
+  const [budgets,setBud] = useState(()=>lsGet("as_bud",{}));
+  const [debts,setDeb]   = useState(()=>lsGet("as_deb",[]));
+  const [goals,setGoa]   = useState(()=>lsGet("as_goa",[]));
+  const [toast,setToast] = useState(null);
+  const [modal,setModal] = useState(null);
+
+  useEffect(()=>{lsSet("as_exp",expenses)},[expenses]);
+  useEffect(()=>{lsSet("as_inc",incomes)},[incomes]);
+  useEffect(()=>{lsSet("as_bud",budgets)},[budgets]);
+  useEffect(()=>{lsSet("as_deb",debts)},[debts]);
+  useEffect(()=>{lsSet("as_goa",goals)},[goals]);
+  useEffect(()=>{window.hideSplash?.()},[]);
+
+  const showToast=(msg,type="ok")=>{setToast({msg,type});setTimeout(()=>setToast(null),2800)};
+
+  const cur=nowMonth();
+  const mExp=expenses.filter(e=>e.date.startsWith(cur));
+  const mInc=incomes.filter(i=>i.date.startsWith(cur));
+  const totEx=mExp.reduce((s,e)=>s+ +e.amount,0);
+  const totIn=mInc.reduce((s,i)=>s+ +i.amount,0);
+  const bal=totIn-totEx;
+  const totalDebt=debts.reduce((s,d)=>s+ +d.total,0);
+  const totalPaid=debts.reduce((s,d)=>s+ +d.paid,0);
+
+  const overspent=CATEGORIES.filter(cat=>{
+    const b=+budgets[cat]||0; if(!b)return false;
+    return mExp.filter(e=>e.category===cat).reduce((s,e)=>s+ +e.amount,0)>b;
+  });
+
+  const NAV=[
+    {id:"dashboard",icon:"◈",label:"Home"},
+    {id:"expenses",icon:"↓",label:"Expenses"},
+    {id:"income",icon:"↑",label:"Income"},
+    {id:"karza",icon:"⛓",label:"Karza"},
+    {id:"goals",icon:"◎",label:"Goals"},
+  ];
+
+  const fabAction={dashboard:()=>setModal("expense"),expenses:()=>setModal("expense"),income:()=>setModal("income"),karza:()=>setModal("debt"),goals:()=>setModal("goal")}[tab];
+
+  return <div style={{maxWidth:430,margin:"0 auto",minHeight:"100vh",position:"relative",background:"var(--cream)"}}>
+    {/* Header */}
+    <header style={{padding:"26px 24px 0"}}>
+      <div className="fade-up" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <div className="display gold-shimmer" style={{fontSize:28,fontWeight:600,letterSpacing:"-0.5px"}}>ArthaSaathi</div>
+          <div style={{fontSize:10,color:"var(--muted)",letterSpacing:2.5,textTransform:"uppercase",marginTop:1}}>Your Money Companion</div>
+        </div>
+        <div style={{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg,#0a0a0f,#1a1a2e)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--gold-light)",fontSize:17,fontFamily:"serif",fontWeight:700,boxShadow:"0 4px 16px rgba(0,0,0,0.22)"}}>S</div>
+      </div>
+    </header>
+
+    {/* Overspend banner */}
+    {overspent.length>0&&<div className="overspend-banner fade-up" style={{margin:"14px 20px 0",padding:"10px 14px",borderRadius:12}}>
+      <div style={{fontSize:12,fontWeight:500,color:"var(--red)"}}>⚠ Budget exceeded: {overspent.join(", ")}</div>
+    </div>}
+
+    {/* Main */}
+    <main style={{padding:"18px 18px 110px"}}>
+      {tab==="dashboard"&&<Dashboard bal={bal} totEx={totEx} totIn={totIn} mExp={mExp} setTab={setTab} setModal={setModal} budgets={budgets} debts={debts} goals={goals} totalDebt={totalDebt} totalPaid={totalPaid}/>}
+      {tab==="expenses"&&<ExpensesTab expenses={expenses} setEx={setEx} showToast={showToast}/>}
+      {tab==="income"&&<IncomeTab incomes={incomes} setInc={setInc} showToast={showToast}/>}
+      {tab==="karza"&&<KarzaTab debts={debts} setDeb={setDeb} setModal={setModal} showToast={showToast}/>}
+      {tab==="goals"&&<GoalsTab goals={goals} setGoa={setGoa} setModal={setModal} showToast={showToast}/>}
+      {tab==="reports"&&<ReportsTab expenses={expenses} incomes={incomes}/>}
+    </main>
+
+    {/* Bottom Nav */}
+    <nav style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"rgba(255,255,255,0.94)",backdropFilter:"blur(20px)",borderTop:"1px solid var(--border)",padding:"8px 4px 18px",display:"grid",gridTemplateColumns:"repeat(5,1fr)",zIndex:100}}>
+      {NAV.map(n=>(
+        <button key={n.id} onClick={()=>setTab(n.id)} style={{background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"5px 2px",borderRadius:12,color:tab===n.id?"var(--gold)":"var(--muted)",fontWeight:tab===n.id?500:400}}>
+          <span style={{fontSize:17}}>{n.icon}</span>
+          <span style={{fontSize:9.5,letterSpacing:0.3}}>{n.label}</span>
+        </button>
+      ))}
+    </nav>
+
+    {/* FAB */}
+    <button className="btn-gold" onClick={fabAction} style={{position:"fixed",bottom:82,right:"calc(50% - 215px + 18px)",width:54,height:54,borderRadius:"50%",fontSize:26,display:"flex",alignItems:"center",justifyContent:"center",zIndex:99,boxShadow:"0 8px 26px rgba(201,168,76,0.55)"}}>+</button>
+
+    {/* Modals */}
+    {modal==="expense"&&<AddExpenseModal onClose={()=>setModal(null)} onAdd={e=>{setEx(p=>[e,...p]);setModal(null);showToast("Expense saved")}}/>}
+    {modal==="income"&&<AddIncomeModal onClose={()=>setModal(null)} onAdd={i=>{setInc(p=>[i,...p]);setModal(null);showToast("Income recorded","inc")}}/>}
+    {modal==="budget"&&<BudgetModal budgets={budgets} setBudgets={v=>{setBud(v);setModal(null);showToast("Budgets updated")}} onClose={()=>setModal(null)}/>}
+    {modal==="debt"&&<AddDebtModal onClose={()=>setModal(null)} onAdd={d=>{setDeb(p=>[d,...p]);setModal(null);showToast("Debt added","debt")}}/>}
+    {modal==="goal"&&<AddGoalModal onClose={()=>setModal(null)} onAdd={g=>{setGoa(p=>[g,...p]);setModal(null);showToast("Goal created 🎯","goal")}}/>}
+    {modal?.startsWith("payDebt:")&&<PayDebtModal debt={debts.find(d=>d.id===modal.split(":")[1])} onClose={()=>setModal(null)} onPay={(id,amt)=>{setDeb(p=>p.map(d=>d.id===id?{...d,paid:Math.min(+d.total,+d.paid+ +amt)}:d));setModal(null);showToast("Payment recorded 💪")}}/>}
+    {modal?.startsWith("addFund:")&&<AddGoalFundModal goal={goals.find(g=>g.id===modal.split(":")[1])} onClose={()=>setModal(null)} onAdd={(id,amt)=>{setGoa(p=>p.map(g=>g.id===id?{...g,saved:Math.min(+g.target,+g.saved+ +amt)}:g));setModal(null);showToast("Savings updated 🌟","goal")}}/>}
+
+    {/* Toast */}
+    {toast&&<div className="slide-in" style={{position:"fixed",top:18,left:"50%",transform:"translateX(-50%)",background:{ok:"var(--ink)",inc:"var(--green)",debt:"var(--red)",goal:"var(--purple)"}[toast.type]||"var(--ink)",color:"white",padding:"10px 22px",borderRadius:50,fontSize:13,fontWeight:500,zIndex:999,boxShadow:"0 8px 24px rgba(0,0,0,0.22)",whiteSpace:"nowrap"}}>
+      {{ok:"✓ ",inc:"₹ ",debt:"⛓ ",goal:"🎯 "}[toast.type]||"✓ "}{toast.msg}
+    </div>}
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+
+<script>
+// Service Worker
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
+// Splash hide
+window.hideSplash = () => {
+  const s = document.getElementById('splash');
+  if(s){ s.classList.add('hidden'); setTimeout(()=>s.remove(),600); }
+};
+setTimeout(()=>window.hideSplash?.(), 4000);
+
+// Install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); deferredPrompt=e;
+  if(!localStorage.getItem('as_install_dismissed'))
+    setTimeout(()=>document.getElementById('install-banner').classList.add('show'),4000);
+});
+document.getElementById('ib-btn').onclick = async ()=>{
+  if(!deferredPrompt) return;
+  document.getElementById('install-banner').classList.remove('show');
+  deferredPrompt.prompt();
+  deferredPrompt=null;
+};
+document.getElementById('ib-x').onclick = ()=>{
+  document.getElementById('install-banner').classList.remove('show');
+  localStorage.setItem('as_install_dismissed','true');
+};
+</script>
 </body>
 </html>
